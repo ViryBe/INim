@@ -3,6 +3,37 @@
 
 import os, osproc, rdstdin, strformat, strutils, terminal, times, strformat
 
+import nimpy
+let
+    py = pyBuiltinsModule()
+
+    tk = pyImport("prompt_toolkit")
+    history = pyImport("prompt_toolkit.history")
+    auto_suggest = pyImport("prompt_toolkit.auto_suggest")
+    comp = pyImport("prompt_toolkit.completion")
+
+    # from prompt_toolkit.lexers import PygmentsLexer
+    lexer_tk = pyImport("prompt_toolkit.lexers")
+    pygment = pyImport("pygments.lexers.nimrod")
+
+    html_completer = comp.WordCompleter([
+      "addr", "and", "as", "asm", "atomic", "bind", "block", "break", "case",
+      "cast", "concept", "const", "continue", "converter", "defer", "discard",
+      "distinct", "div", "do", "elif", "else", "end", "enum", "except",
+      "export", "finally", "for", "func", "if", "in", "yield", "interface",
+      "is", "isnot", "iterator", "let", "macro", "method", "mixin", "mod",
+      "not", "notin", "object", "of", "or", "out", "proc", "ptr", "raise",
+      "ref", "return", "shared", "shl", "shr", "static", "template", "try",
+      "tuple", "type", "when", "while", "with", "without", "xor",
+      "nil", "true", "false",
+      "and", "or", "not", "xor", "shl", "shr", "div", "mod", "in",
+      "notin", "is", "isnot",
+      "int", "int8", "int16", "int32", "int64", "float", "float32", "float64",
+      "bool", "char", "range", "array", "seq", "set", "string",
+      "exit", "quit"
+    ])
+
+
 type App = ref object
     nim: string
     srcFile: string
@@ -11,7 +42,7 @@ type App = ref object
 var app: App
 
 const
-    INimVersion = "0.4.1"
+    INimVersion = "0.4.2"
     indentSpaces = "    "
     indentTriggers = [",", "=", ":", "var", "let", "const", "type", "import",
                       "object", "enum"] # endsWith
@@ -240,7 +271,13 @@ proc runForever() =
     while true:
         # Read line
         try:
-            currentExpression = readLineFromStdin(getPromptSymbol()).strip
+
+            currentExpression = tk.prompt(getPromptSymbol(),
+                                          history=history.FileHistory("inim_hist"),
+                                          auto_suggest=auto_suggest.AutoSuggestFromHistory(),
+                                          completer=html_completer,
+                                          lexer=lexer_tk.PygmentsLexer(pygment.NimrodLexer)).to(string).strip
+            
         except IOError:
             bufferRestoreValidCode()
             indentLevel = 0

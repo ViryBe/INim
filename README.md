@@ -16,3 +16,11 @@
 
 ## Contributing
 Pull requests and suggestions are welcome.
+
+
+# Added in my version
+depend on python3, prompt_toolkit & pygment
+Enable:
+* Syntax coloration
+* history
+* keyword completion
