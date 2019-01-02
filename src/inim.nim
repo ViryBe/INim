@@ -43,7 +43,7 @@ var app: App
 
 const
     INimVersion = "0.4.2"
-    indentSpaces = "    "
+    indentSpaces = "  "
     indentTriggers = [",", "=", ":", "var", "let", "const", "type", "import",
                       "object", "enum"] # endsWith
     embeddedCode = staticRead("inimpkg/embedded.nim") # preloaded code into user's session
